@@ -26,4 +26,19 @@ Hill-climbing often gets stuck because of *local maxima*. A local maximum is a p
 Random-restart hill-climbing conducts a series of hill-climbing searches from randomly generated initial states, until a goal is found. In this implementation I let the algorithm try to find a goal using the original state, but until a threshold is reached. If the threshold is reached and no solution is found, a new random initial state is generated and the algorithm tries again. With the random-restart feauture implemented, the algorithm becomes very effective. 
 
 
+### Snapshots 
+
+
+Initial State | Solution| 
+:--- | :---
+![](https://i.imgur.com/SqHZ80C.png) | ![](https://i.imgur.com/TJJC5F3.png)
+![](https://i.imgur.com/K0fpM4L.png) | ![](https://i.imgur.com/Xvlgs7w.png)
+![](https://i.imgur.com/KZTDxzS.png) | ![](https://i.imgur.com/eIvILXE.png)
+
+### Tests
+
+Under you can see the results of running multiple testcases for different N's. When N grows beyond 10, I had to increase the threshold for the maxAttempts in order to find a solution. As you can see, time increases exponentially when N grows, but a lot can be done to speed up this algorithm. 
+
+![](https://i.imgur.com/BCJMjTk.png)
+
 
