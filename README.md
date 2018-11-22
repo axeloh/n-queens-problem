@@ -36,8 +36,7 @@ Initial State | Solution|
 ![](https://i.imgur.com/KZTDxzS.png) | ![](https://i.imgur.com/eIvILXE.png)
 
 ### Tests
-
-Under you can see the results of running multiple testcases for different N's. When N grows beyond 10, I had to increase the threshold for the maxAttempts in order to find a solution. As you can see, time increases exponentially when N grows, but a lot can be done to speed up this algorithm. 
+To check the completeness of the algorithm one can run multiple testcases (now set to 200 problems with random initial state) for the different N's. The results gets logged in the console. Eventually when N grows , one must increase the threshold for the maxAttempts in order to find a solution. As you can see, time increases exponentially when N grows, but a lot can be done to speed up this algorithm. 
 
 ![](https://i.imgur.com/BCJMjTk.png)
 
