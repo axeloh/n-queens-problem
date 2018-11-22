@@ -6,7 +6,7 @@ The N Queen is the problem of placing N chess queens on an N×N chessboard so th
 
 ![](https://i.imgur.com/Pjc8PLd.png)
 
-No two queens are on the same row, column, or diagonal.
+No two queens are on the same row, column, or diagonal.<br/>
 Solutions exist for all natural numbers N with the exception of N=2 and N=3.
 
 ### Run
