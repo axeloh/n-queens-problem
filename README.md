@@ -27,7 +27,7 @@ Random-restart hill-climbing conducts a series of hill-climbing searches from ra
 
 
 ### Snapshots 
-Under are some snapshots for different N's. The highest value of N I have tried is N = 100, in which a solution was found in about 10 minutes.
+Under are some snapshots for different N's. The highest value of N I have tried is **N = 100** and **maxAttempts = 1500**, in which a solution was found in about 10 minutes.
 
 Initial State | Solution| 
 :--- | :---
