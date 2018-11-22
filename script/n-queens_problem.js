@@ -97,7 +97,7 @@ function main() {
 function search_loop() {
     var totalTries = 0;
     var currentStateTries = 0;
-
+    var start = performance.now();
     // Loops until either a solution is found or the maxAttempt-treshold is reached
     while (totalHeuristicCost > 0 && totalTries < maxAttempts) {
         if (currentStateTries > n*5) {
@@ -110,15 +110,20 @@ function search_loop() {
         totalTries++;
         currentStateTries++;
     }
+    var end = performance.now()
+    var time = end - start
 
     if (totalHeuristicCost == 0) {
         // Solution is found
+        //console.log("Found solution for n = " + n + " in " + time/1000 + " seconds");
         return true;
     }
     else {
         // No solution found in *maxAttempts* attempts
+        //console.log("No solution found for n = " + n + " in " + time/100 + " seconds");
         return false;
     }
+
     
 }
 
