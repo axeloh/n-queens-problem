@@ -9,46 +9,80 @@ var board;
 var queenYCoordinates;
 var heuristicTable;
 var totalHeuristicCost;
-var queenStart;
+var globalMins;
 
-
-function generateBoard(){
-    n = document.getElementById("N").value;
-    if (n < 4 || n > 12) {
-        alert("Choose n between 4 and 12")
-        return;
-    }
-        
+function drawBoard() {
     width = 62.5*n;;
     height = 62.5*n;
     xblock = width/n;
     yblock = height/n;
-    console.log(n);
     
     createCanvas(width, height);
-    
+    colorize();
+    drawQueens();
+}
+
+function createBoard() {
+
+}
+
+function generateInitialState(){
+    var number = document.getElementById("N").value;
+    if (number < 0 || number == 2 || number == 3) {
+        alert("N bust be a nonnegative natural number and not equal 2 or 3.")
+        return;
+    }
+    n = number
     board = []
     queenYCoordinates = []
     heuristicTable = []
     totalHeuristicCost = Math.pow(10, 1000);
+    globalMins = []
 
-    // Coloring the board
-    colorize();
-
+    // Initializing the board with all empty squares
+    initializeBoard();
+    
     // Randomly putting one queen in each column with a total of n queens
     setQueensRandom();
-    drawQueens();
 
-    
+    // "Initialize" the heuristic table
+    setHeuristicTable();
+
+    drawBoard();
+
+
 }
 
 
 function setup() {
-    document.getElementById("generateBoard").onclick = generateBoard;
+    document.getElementById("generateBoard").onclick = generateInitialState;
     document.getElementById("main").onclick = main;
 
 }
 
+
+function percentage() {
+    var totalConflicts = 0;
+    for (var i = 0; i < 50; i++) {
+        var count = 0;
+        while (totalHeuristicCost > 0) {
+            if (count > 1000) {
+                break
+            }
+            search();
+            count++;
+        }
+        totalConflicts += totalHeuristicCost;
+        console.log(heuristicTable);
+        
+        setHeuristicTable();
+        undrawQueens();
+        generateInitialState();
+    }
+    
+    console.log("Testet 50 problems with random initial state");
+    console.log("The average total conflicts was " + totalConflicts/50);
+}
 
 function main() {
     
@@ -59,30 +93,28 @@ function main() {
     The heuristic cost function h is the number of pairs of queens that are attacking each other, either directly or indirectly.
     */
 
-    // "Initialize" the heuristic table
-    setHeuristicTable();
-
     undrawQueens();
 
-    // Start search-loop
     var count = 0;
+
+    // Start search-loop
     while (totalHeuristicCost > 0) {
         if (count > 1000) {
             break
         }
         search();
         count++;
-        
     }
-    console.log("Total conflictin queens: " + totalHeuristicCost);
+
+    if (totalHeuristicCost == 0) {
+        console.log("Found a solution.");
+    }
+    else {
+        console.log("Did not found a solution. Ending with total conflicts = " + totalHeuristicCost);
+    }
     
     drawQueens();
-
-
-
-   // drawQueens();
     
-
 }
 
 function undrawQueens(){
@@ -99,56 +131,6 @@ function undrawQueens(){
 }
 
 
-function colorize(){
-    for (var y = 0; y < n; y ++) {
-        board[y] = []
-        for (var x = 0; x < n; x ++) {
-            if ((y + x + 1) % 2 == 0) {
-                fill(255, 255, 255); // white
-            } else {
-                fill(0, 0, 0); // black
-            }
-            rect(y * xblock, x * yblock, (y + 1) * xblock, (x + 1) * yblock);     
-        } 
-    }
-}
-
-
-
-function setQueensRandom() {
-    for (var x = 0; x < n; x ++) {
-        var queen_y = Math.floor(Math.random() * n)
-        for (var y = 0; y < n; y ++) {
-            if (y === queen_y){
-                board[y][x] = true
-                queenYCoordinates[x] = queen_y
-            }
-            else {
-                board[y][x] = false
-            }
-        }
-    }
-}
-
-function drawQueens(){
-    for (var x = 0; x < n; x ++) {
-        for (var y = 0; y < n; y ++) {
-            if (board[y][x]){
-                fill('orange')
-                ellipse(x*xblock+30, y*yblock+30 , xblock/1.5, yblock/1.5)
-            }
-        }
-    }
-}
-
-function setHeuristicTable() {
-    for (x = 0; x < n; x++) {
-        heuristicTable[x] = []
-        for (y = 0; y < n; y++) {
-            heuristicTable[x].push(0)
-        }
-    }
-}
 
 function getHeuristicCost() {
     var totalConflictsCount = 0
@@ -196,7 +178,6 @@ function search() {
     }
 
     var globalMin = [-1, -1, Math.pow(10, 1000)];
-    var globalMins = []
 
     for (x = 0; x < n; x++) {
         var columnHeuristics = []
@@ -215,12 +196,18 @@ function search() {
         }
     }
     
+    // If there are multiple global minimums choose randomly 
+    if (globalMins.length > 1){
+        var index = Math.floor(Math.random() * globalMins.length)
+        
+        globalMin = globalMins[index]
+    }
+
     // Move the queen 
     var globalMinY = globalMin[0]
     var globalMinX = globalMin[1]
     var newTotalHeuristicCost = globalMin[2]
     var currentQueenY = queenYCoordinates[globalMinX]
-    
 
     queenYCoordinates[globalMinX] = globalMinY
 
@@ -228,7 +215,7 @@ function search() {
     board[globalMinY][globalMinX] = true
     totalHeuristicCost = newTotalHeuristicCost
     
-    //console.log(globalMin);
+    //console.log(globalMins);
     //console.log(heuristicTable);
 
 }
@@ -281,4 +268,62 @@ function getConflictCount(current_y, current_x) {
     result.push(conflictSquares)
     return result;
 
+}
+
+
+function initializeBoard() {
+    for (x = 0; x < n; x++) {
+        board[x] = []
+        for (y = 0; y < n; y++) {
+            board[x].push(false)
+        }
+    }
+}
+
+
+function colorize(){
+    for (var y = 0; y < n; y ++) {
+        for (var x = 0; x < n; x ++) {
+            if ((y + x + 1) % 2 == 0) {
+                fill(255, 255, 255); // white
+            } else {
+                fill(0, 0, 0); // black
+            }
+            rect(y * xblock, x * yblock, (y + 1) * xblock, (x + 1) * yblock);     
+        } 
+    }
+}
+
+
+
+function setQueensRandom() {
+    for (var x = 0; x < n; x ++) {
+        var queen_y = Math.floor(Math.random() * n)
+        for (var y = 0; y < n; y ++) {
+            if (y === queen_y){
+                board[y][x] = true
+                queenYCoordinates[x] = queen_y
+            }
+        }
+    }
+}
+
+function drawQueens(){
+    for (var x = 0; x < n; x ++) {
+        for (var y = 0; y < n; y ++) {
+            if (board[y][x]){
+                fill('orange')
+                ellipse(x*xblock+30, y*yblock+30 , xblock/1.5, yblock/1.5)
+            }
+        }
+    }
+}
+
+function setHeuristicTable() {
+    for (x = 0; x < n; x++) {
+        heuristicTable[x] = []
+        for (y = 0; y < n; y++) {
+            heuristicTable[x].push(0)
+        }
+    }
 }
