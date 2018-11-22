@@ -57,11 +57,10 @@ function test() {
         return;
     }
     maxAttempts = document.getElementById("maxAttempts").value;
-    var totalConflicts = 0;
     var solved = 0;
     var unsolved = 0;
-    var numberOfTests = 300;
-
+    var numberOfTests = 200;
+    var start = performance.now();
 
     for (var i = 0; i < numberOfTests; i++) {
         if (search_loop()){
@@ -69,18 +68,20 @@ function test() {
         }
         else {
             unsolved++;
-            totalConflicts += totalHeuristicCost;
         }
         
         setHeuristicTable();
         generateInitialState();
     }
+
+    var end = performance.now()
+    const time = end-start;
     console.log("-------------- TESTCASE -------------------");
     console.log("Tested " + numberOfTests + " problems for n = " + n + ",  each with random initial state");
     console.log("Number of solved problems: " + solved);
     console.log("Number of unsolved problems: " + unsolved);
     console.log("Percentage solved: " + (solved/numberOfTests)*100);
-    console.log("The average total conflicts was " + totalConflicts/numberOfTests);
+    console.log("Time used: " + time/1000 + " seconds");
     console.log("--------------------------------------------");
     
 }
@@ -95,19 +96,19 @@ function main() {
 
 function search_loop() {
     var totalTries = 0;
-    var currentInitialStateTries = 0;
+    var currentStateTries = 0;
 
     // Loops until either a solution is found or the maxAttempt-treshold is reached
     while (totalHeuristicCost > 0 && totalTries < maxAttempts) {
-        if (currentInitialStateTries > 100) {
-            // Restart the initial state and try again if the goal is not reached after 100 attempts
+        if (currentStateTries > n*5) {
+            // Restart the initial state and try again if the goal is not reached after n*5 attempts
             undrawQueens();
             generateInitialState();
-            currentInitialStateTries = 0;
+            currentStateTries = 0;
         }
         search();
         totalTries++;
-        currentInitialStateTries++;
+        currentStateTries++;
     }
 
     if (totalHeuristicCost == 0) {
